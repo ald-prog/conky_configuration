@@ -1,0 +1,124 @@
+
+# -------------------------------------------------------------------
+# File: .conkyrc
+# Type: conky main file
+# By ald-prog
+# Last modified:2025-03-15
+# ------------------------
+# Main File to Run
+# / OS : $Linux (Mainly) but can be adjusted for Windows
+# -------------------------------------------------------------------
+
+background yes
+
+font 7x13
+# Use Xft?
+use_xft yes
+xftfont Noto Sans Mono:size=9
+xftalpha 0.1
+override_utf8_locale yes
+short_units
+
+update_interval 5
+total_run_times 0
+
+own_window yes
+own_window_type normal
+own_window_transparent yes
+#own_window_argb_value 0 #transparent level 0 - 255
+own_window_class Conky
+own_window_argb_visual yes
+own_window_colour 082103
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+
+double_buffer yes
+minimum_size 340 5
+maximum_width 340
+max_text_width 0
+
+draw_shades yes
+draw_outline no
+draw_borders no
+draw_graph_borders yes
+stippled_borders 5
+border_inner_margin 0
+border_outer_margin 0
+border_width 1
+
+default_color white
+default_shade_color black
+default_outline_color black
+color0 dodgerblue
+color1 DarkSeaGreen
+color2 SeaGreen
+color3 GreenYellow
+color4 red
+color5 yellowOrange
+color6 gold
+color7 darkgray
+color8 green
+color9 darkslategray
+default_bar_size 100 10
+
+alignment top_left
+gap_x 4 #horizontal
+gap_y 1 #vertical
+
+no_buffers yes
+uppercase no
+cpu_avg_samples 2
+net_avg_samples 2
+use_spacer none
+
+top_name_width 18
+top_cpu_separate false
+
+
+
+TEXT
+
+${voffset -16}${font sans-serif:bold:size=18}${alignc}${color0}${time %H:%M:%S}${font}
+${voffset 1}${alignc}${time %A %B %d, %Y}
+# Weather Data using OpenWeatherMap API
+${font Liberation Sans:size=8}${color CCCCDD}${voffset 2}${execi 60 curl -s "http://ip-api.com/json" | jq -r '.city'}, ${execi 60 curl -s "http://ip-api.com/json" | jq -r '.country'}$font
+${voffset -14}${font Liberation Sans:size=30:style=bold}${goto 170}${color 77bfe8}${execi 60 curl -s "http://api.openweathermap.org/data/2.5/weather?lat=$(curl -s http://ip-api.com/json | jq -r '.lat')&lon=$(curl -s http://ip-api.com/json | jq -r '.lon')&appid=2ea3ba00dee0988a8ad7d1800ae88804&units=metric" | jq -r '.main.temp'}°C${color}
+${voffset -65}${font Liberation Sans:size=8:style=bold}${color FF8C00}Condition: ${execi 60 curl -s "http://api.openweathermap.org/data/2.5/weather?lat=$(curl -s http://ip-api.com/json | jq -r '.lat')&lon=$(curl -s http://ip-api.com/json | jq -r '.lon')&appid=2ea3ba00dee0988a8ad7d1800ae88804&units=metric" | jq -r '.weather[0].main'}${color}
+${voffset 0}${font Liberation Sans:size=8:style=bold}${color EEFFFE}Humidity: ${color 77bfe8}${execi 60 curl -s "http://api.openweathermap.org/data/2.5/weather?lat=$(curl -s http://ip-api.com/json | jq -r '.lat')&lon=$(curl -s http://ip-api.com/json | jq -r '.lon')&appid=2ea3ba00dee0988a8ad7d1800ae88804&units=metric" | jq -r '.main.humidity'}%${color}
+${voffset 0}${font Liberation Sans:size=8:style=bold}${color EEFFFE}Wind Speed: ${color 3cbf9a}${execi 60 curl -s "http://api.openweathermap.org/data/2.5/weather?lat=$(curl -s http://ip-api.com/json | jq -r '.lat')&lon=$(curl -s http://ip-api.com/json | jq -r '.lon')&appid=2ea3ba00dee0988a8ad7d1800ae88804&units=metric" | jq -r '.wind.speed'} m/s ${color}
+${voffset -6}${color0}${hr 2}${color}
+# System part
+${voffset -10}${font}${color2}${stippled_hr 4}
+${color}Host: ${color0}$nodename${goto 165}${color} Uptime:${color8}$uptime
+${color}Linux Kernel: ${color0}${kernel} on ${exec cat /etc/slackware-version}
+${color}CPU  Details: ${color0}${exec cat /proc/cpuinfo | grep 'model name' | sed -e 's/model name.*: //' | sed -e 's/(R)//' | sed -e 's/(TM)//'| uniq | sed 's/CPU//g' | sed 's/0 @//g'}
+${color}Architecture:${color0} ${machine} ${color}Current Frequency:${color OrangeRed1} $freq(MHz)
+${color}CPU1:${offset +4}${color OrangeRed1}${cpubar cpu1 10,100} ${cpu cpu1}% ${goto 165}${color} CPU2:${offset +4}${color OrangeRed1}${cpubar cpu2 10,100} ${cpu cpu2}%
+${voffset 3}${color}RAM: ${color DarkOrange1} ${mem}${color}/$memmax  ${color OrangeRed1}$acpitemp°C ${color DarkOrange1}$alignr ${membar 10,140} ${memperc}%
+${color}SWAP: ${color6}${swap}${color}/${swapmax}${goto 165}${color6} ${swapbar 10,140} ${swapperc}%
+${color9}${cpugraph 3dba19 aecf4c -t -l}
+# Network
+${color}Ethernet: ${color0}Upload:${color OrangeRed1} ${upspeed eno1}/s ${color0}${goto 210}Download:${color6} ${downspeed eno1}/s
+${color9}${upspeedgraph eno1 24,165 000000 ec3131} ${color9}${downspeedgraph eno1 24,165 000000 91ec31}
+${color}Wi-Fi: ${color0}Upload:${color OrangeRed1} ${upspeed wlo1}/s${color0}${goto 210}Download:${color6} ${downspeed wlo1}/s
+${color9}${upspeedgraph wlo1 24,165 000000 ec3131} ${color9}${downspeedgraph wlo1 24,165 000000 91ec31}
+# Falignc}${color0}(Top 5 Processes by MEM Usage)
+${voffset 3}${color}File Systems ${color0}${hr 2}
+${font sans-serif:normal:size=9}${color}Root $alignc ${color3}${fs_used /} ${color}/ ${fs_size /} $alignr${color7}${fs_bar 10,140 /} ${fs_used_perc /}%
+${font sans-serif:normal:size=9}${color}Home $alignc ${color3}${fs_used /home} ${color}/ ${fs_size /home}$alignr${color7} ${fs_bar 10,140 /home} ${fs_used_perc /home}%
+# Disk
+${voffset 3}${color}Disk IO ${color0}${hr 2}
+${color0}dev${alignr 165}write${alignr 122} read${alignr 90} temp
+${color3}sda${alignr 110}${color yellow1}${diskio_write sda}${alignr 50}${color8}${diskio_read sda}${alignr 20}${color yellow1}${hddtemp /dev/sda}${if_match "${hddtemp /dev/sda}" != "N/A"}${lua_parse deg}${else}${endif}${alignr 5}${color9}${diskiograph sda 12,70 9855a3 5e066c 0 -t -l}
+# Proc and Mem usage
+${voffset 3}${color}Processes:${color8} ${processes}  ${color}Running:${color8} ${running_processes} ${color0}${hr 2}
+${alignc}${color}(Top Sorted by CPU Usage & MEM Usage)
+${color}NAME${alignr 50} PID ${alignr 30}CPU%${alignr 5}MEM%
+${color0}${top name 1}${alignr 50} ${top pid 1} ${alignr 30}${top cpu 1}% ${alignr 5}${top mem 1}%
+${color0}${top name 2}${alignr 50} ${top pid 2} ${alignr 30}${top cpu 2}% ${alignr 5}${top mem 2}%
+${color0}${top name 3}${alignr 50} ${top pid 3} ${alignr 30}${top cpu 3}% ${alignr 5}${top mem 3}%
+#${alignc}${color}(Top Sorted by MEM Usage)
+${color}NAME${alignr 50} PID ${alignr 30}CPU%${alignr 5}MEM%
+${color0}${top_mem name 1}${alignr 50} ${top_mem pid 1} ${alignr 30}${top_mem cpu 1}% ${alignr 5}${top_mem mem 1}%
+${color0}${top_mem name 2}${alignr 50} ${top_mem pid 2} ${alignr 30}${top_mem cpu 2}% ${alignr 5}${top_mem mem 2}%
+${color0}${top_mem name 3}${alignr 50} ${top_mem pid 3} ${alignr 30}${top_mem cpu 3}% ${alignr 5}${top_mem mem 3}%
+${voffset -3}${color9}${hr 2}
